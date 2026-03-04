@@ -1,4 +1,6 @@
+import cv2
 import numpy as np
+import pytest
 
 from app.operators.geometric.affine_image import AffineImage
 
@@ -35,14 +37,26 @@ class TestAffineImageDefaults:
         translated_patch = result[110:150, 60:100]
         assert translated_patch.max() > 0, "Translated content should be visible at destination"
 
-    def test_default_matches_old_hardcoded_behaviour(self):
-        """Default params must reproduce exactly the matrix [[1,0,50],[0,1,100]]."""
-        import cv2
+        # The original location should now be empty (content translated away).
+        source_patch = result[10:50, 10:50]
+        assert source_patch.max() == 0, "Source region should be empty after translation"
 
+    def test_default_matches_old_hardcoded_behaviour(self):
+        """Default params must reproduce the matrix [[1,0,50],[0,1,100]] within ±1 LSB.
+
+        Uses ``assert_allclose`` rather than ``assert_array_equal`` because
+        ``cv2.getAffineTransform`` (float32 path) and a raw float64 matrix can differ
+        by up to 1 LSB after ``warpAffine`` bilinear interpolation on some OpenCV builds.
+        """
         img = _solid_image(300, 300)
         expected = cv2.warpAffine(img, np.float64([[1, 0, 50], [0, 1, 100]]), (300, 300))
         result = AffineImage(params={}).compute(img)
-        np.testing.assert_array_equal(result, expected)
+        np.testing.assert_allclose(
+            result.astype(np.float64),
+            expected.astype(np.float64),
+            atol=1,
+            err_msg="Default params should reproduce the old hardcoded translation",
+        )
 
 
 class TestAffineImageCustomParams:
@@ -144,3 +158,65 @@ class TestAffineImageEdgeCases:
         img = np.full((10, 10, 3), 128, dtype=np.uint8)
         result = AffineImage(params={}).compute(img)
         assert result.shape == img.shape
+
+    def test_collinear_source_points_raises(self):
+        """Three collinear src points produce a singular transform; operator must raise."""
+        params = {
+            # All three source points lie on y=0 — degenerate triangle.
+            "src_x0": 0,
+            "src_y0": 0,
+            "src_x1": 50,
+            "src_y1": 0,
+            "src_x2": 100,
+            "src_y2": 0,
+            "dst_x0": 0,
+            "dst_y0": 0,
+            "dst_x1": 50,
+            "dst_y1": 50,
+            "dst_x2": 100,
+            "dst_y2": 100,
+        }
+        img = _solid_image()
+        with pytest.raises(ValueError, match="collinear"):
+            AffineImage(params=params).compute(img)
+
+    def test_collinear_destination_points_raises(self):
+        """Three collinear dst points produce a singular transform; operator must raise."""
+        params = {
+            "src_x0": 0,
+            "src_y0": 0,
+            "src_x1": 50,
+            "src_y1": 50,
+            "src_x2": 100,
+            "src_y2": 100,
+            # All three destination points lie on y=0 — degenerate triangle.
+            "dst_x0": 0,
+            "dst_y0": 0,
+            "dst_x1": 50,
+            "dst_y1": 0,
+            "dst_x2": 100,
+            "dst_y2": 0,
+        }
+        img = _solid_image()
+        with pytest.raises(ValueError, match="collinear"):
+            AffineImage(params=params).compute(img)
+
+    def test_invalid_param_type_raises(self):
+        """Non-numeric param values must raise ``ValueError`` with a clear message."""
+        params = {
+            "src_x0": "not-a-number",
+            "src_y0": 0,
+            "src_x1": 100,
+            "src_y1": 0,
+            "src_x2": 0,
+            "src_y2": 100,
+            "dst_x0": 50,
+            "dst_y0": 100,
+            "dst_x1": 150,
+            "dst_y1": 100,
+            "dst_x2": 50,
+            "dst_y2": 200,
+        }
+        img = _solid_image()
+        with pytest.raises(ValueError, match="src_x0"):
+            AffineImage(params=params).compute(img)

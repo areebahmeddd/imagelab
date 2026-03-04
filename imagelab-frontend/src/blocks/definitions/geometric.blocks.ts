@@ -61,33 +61,43 @@ export const geometricBlocks = [
   },
   {
     type: "geometric_affineimage",
-    message0: "Apply affine transformation %1 Source points %2 P0 x %3 y %4 %5 P1 x %6 y %7 %8 P2 x %9 y %10 %11 Destination points %12 P0 x %13 y %14 %15 P1 x %16 y %17 %18 P2 x %19 y %20",
+    // %1–%11: source points section; %12–%21: destination points section.
+    // The trailing %21 input_dummy keeps the last row visually consistent with every
+    // other point group (each group ends with a line-break dummy).
+    message0:
+      "Apply affine transformation %1 Source points %2 P0 x %3 y %4 %5 P1 x %6 y %7 %8 P2 x %9 y %10 %11 Destination points %12 P0 x %13 y %14 %15 P1 x %16 y %17 %18 P2 x %19 y %20 %21",
     args0: [
       { type: "input_dummy" },
       { type: "input_dummy" },
-      { type: "field_number", name: "src_x0", value: 0 },
-      { type: "field_number", name: "src_y0", value: 0 },
+      { type: "field_number", name: "src_x0", value: 0, min: -10000, max: 10000 },
+      { type: "field_number", name: "src_y0", value: 0, min: -10000, max: 10000 },
       { type: "input_dummy" },
-      { type: "field_number", name: "src_x1", value: 100 },
-      { type: "field_number", name: "src_y1", value: 0 },
+      { type: "field_number", name: "src_x1", value: 100, min: -10000, max: 10000 },
+      { type: "field_number", name: "src_y1", value: 0, min: -10000, max: 10000 },
       { type: "input_dummy" },
-      { type: "field_number", name: "src_x2", value: 0 },
-      { type: "field_number", name: "src_y2", value: 100 },
+      { type: "field_number", name: "src_x2", value: 0, min: -10000, max: 10000 },
+      { type: "field_number", name: "src_y2", value: 100, min: -10000, max: 10000 },
       { type: "input_dummy" },
       { type: "input_dummy" },
-      { type: "field_number", name: "dst_x0", value: 50 },
-      { type: "field_number", name: "dst_y0", value: 100 },
+      { type: "field_number", name: "dst_x0", value: 50, min: -10000, max: 10000 },
+      { type: "field_number", name: "dst_y0", value: 100, min: -10000, max: 10000 },
       { type: "input_dummy" },
-      { type: "field_number", name: "dst_x1", value: 150 },
-      { type: "field_number", name: "dst_y1", value: 100 },
+      { type: "field_number", name: "dst_x1", value: 150, min: -10000, max: 10000 },
+      { type: "field_number", name: "dst_y1", value: 100, min: -10000, max: 10000 },
       { type: "input_dummy" },
-      { type: "field_number", name: "dst_x2", value: 50 },
-      { type: "field_number", name: "dst_y2", value: 200 }
+      { type: "field_number", name: "dst_x2", value: 50, min: -10000, max: 10000 },
+      { type: "field_number", name: "dst_y2", value: 200, min: -10000, max: 10000 },
+      { type: "input_dummy" },
     ],
     previousStatement: null,
     nextStatement: null,
     style: "geometric_style",
     tooltip:
-      "Applies a fixed affine transformation (translate by 50, 100) - Transforms the image using a predefined affine transformation that translates the image by 50 pixels in the X direction and 100 pixels in the Y direction. This block is useful for demonstrating basic affine transformations, which can include translation, rotation, scaling, and shearing.",
+      "Applies a 2-D affine transformation defined by three source and three destination points — " +
+      "Specify where three points in the source image should map to in the output. " +
+      "This encodes any combination of translation, rotation, scale, and shear. " +
+      "Source and destination triangles must each be non-degenerate (no two identical points, no three collinear points). " +
+      "Default values reproduce a translation of +50 px (X) and +100 px (Y).",
+    helpUrl: "",
   },
 ];
