@@ -26,6 +26,18 @@ def client():
         yield c
 
 
+@pytest.fixture
+def color_image():
+    rng = np.random.default_rng(42)
+    return rng.integers(0, 256, (100, 100, 3), dtype=np.uint8)
+
+
+@pytest.fixture
+def grayscale_image():
+    rng = np.random.default_rng(42)
+    return rng.integers(0, 256, (100, 100), dtype=np.uint8)
+
+
 @pytest.fixture(scope="session")
 def png_b64() -> str:
     img = np.zeros((10, 10, 3), dtype=np.uint8)
