@@ -3,6 +3,20 @@ import base64
 import cv2
 import numpy as np
 import pytest
+from fastapi.testclient import TestClient
+
+from app.main import app
+
+
+@pytest.fixture(scope="session")
+def client():
+    with TestClient(app, raise_server_exceptions=False) as c:
+        yield c
+
+
+@pytest.fixture
+def png_b64(base64_png_image: str) -> str:
+    return base64_png_image
 
 
 @pytest.fixture
