@@ -114,7 +114,8 @@ export const filteringBlocks = [
   },
   {
     type: "filtering_gaborfilter",
-    message0: "Apply Gabor filter %1 kernel size %2 %3 sigma %4 %5 theta (deg) %6 %7 lambda %8 %9 gamma %10",
+    message0:
+      "Apply Gabor filter %1 kernel size %2 %3 sigma %4 %5 theta (deg) %6 %7 lambda %8 %9 gamma %10",
     args0: [
       { type: "input_dummy" },
       { type: "field_number", name: "kernelSize", value: 21, min: 1, precision: 1 },
