@@ -10,19 +10,23 @@ MAX_PROCESSING_DIM = 800
 class GaborFilter(BaseOperator):
     def compute(self, image: np.ndarray) -> np.ndarray:
         kernel_size = int(self.params.get("kernelSize", 21))
-        sigma = float(self.params.get("sigma", 5.0))
+        sigma = max(0.1, float(self.params.get("sigma", 5.0)))
         theta = float(self.params.get("theta", 0.0))
-        lambda_ = float(self.params.get("lambda_", 10.0))
-        gamma = float(self.params.get("gamma", 0.5))
+        lambda_ = max(1.0, float(self.params.get("lambda", 10.0)))
+        gamma = max(0.01, float(self.params.get("gamma", 0.5)))
 
-        if kernel_size % 2 == 0:
-            kernel_size += 1
         kernel_size = max(1, min(kernel_size, MAX_KERNEL_SIZE))
+        if kernel_size % 2 == 0:
+            kernel_size = max(1, kernel_size - 1)
 
         if len(image.shape) == 3 and image.shape[2] == 4:
             image = cv2.cvtColor(image, cv2.COLOR_BGRA2BGR)
 
         original_h, original_w = image.shape[:2]
+
+        if original_w == 0 or original_h == 0:
+            raise ValueError(f"GaborFilter received an image with invalid dimensions: {original_w}x{original_h}")
+
         scale = min(MAX_PROCESSING_DIM / original_w, MAX_PROCESSING_DIM / original_h, 1.0)
         if scale < 1.0:
             small_w = max(1, int(original_w * scale))
