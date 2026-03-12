@@ -429,14 +429,14 @@ export const operatorDocs: Record<string, OperatorDoc> = {
       "Calculates the Laplacian of an image, highlighting regions of rapid intensity change.",
     parameters: [
       {
-        name: "KSize",
+        name: "Kernel Size",
         description:
           "Aperture size for the Laplacian kernel. Must be a positive odd integer: 1, 3, 5, or 7. Larger values detect broader, smoother edges.",
       },
       {
-        name: "DDepth",
+        name: "Output Depth",
         description:
-          "Desired depth of the output image. Use -1 to match the source image depth (recommended default). Other values correspond to OpenCV depth constants.",
+          "Desired depth of the output image. Use -1 to match the source image depth (note: for 8-bit images, negative responses are clipped — use CV_64F to retain full signed output). Other values correspond to OpenCV depth constants.",
       },
     ],
     formula: "Δf = ∂²f/∂x² + ∂²f/∂y²",

@@ -30,18 +30,18 @@ export const transformationBlocks = [
         type: "field_dropdown",
         name: "ksize",
         options: [
-          ["1", "1"],
+          ["1 (finest)", "1"],
           ["3", "3"],
           ["5", "5"],
-          ["7", "7"],
+          ["7 (broadest)", "7"],
         ],
       },
-      { type: "field_number", name: "ddepth", value: -1, min: -1, max: 6 },
+      { type: "field_number", name: "ddepth", value: -1, min: -1, max: 6, precision: 1 },
     ],
     previousStatement: null,
     nextStatement: null,
     style: "transformation_style",
     tooltip:
-      "Apply Laplacian edge detection (second order derivative) - Detects regions of rapid intensity change. Kernel size controls the aperture (1, 3, 5, or 7) — larger values detect broader edges. Output depth: use -1 to match the source image depth, or a specific cv2 depth constant. Useful for blob detection and sharpening edge transitions.",
+      "Apply Laplacian edge detection (second order derivative) - Detects regions of rapid intensity change. Kernel size controls the aperture (1, 3, 5, or 7) — larger values detect broader edges. Output depth: use -1 to match the source image depth (note: for 8-bit images, negative Laplacian responses are clipped to zero — use depth 6 / CV_64F to retain full signed output). Values 0–6 correspond to OpenCV depth constants. Useful for blob detection and sharpening edge transitions.",
   },
 ];
